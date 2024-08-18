@@ -1,50 +1,49 @@
-import './App.css';
-import { useState } from 'react';
-import Options from './Options/Options';
-import Feedback from './Feedback/Feedback';
-import Notification from './Notification/Notification';
-import { getDefaultFieldsState } from './utils';
 
-function App() {
-  const [reviews, setReviews] = useState(getDefaultFieldsState);
-  const { good, neutral, bad } = reviews;
+import css from './App.module.css'
+import React, { useState, useEffect } from "react";
+import Description from './Description/Description'
+import Options from './Options/Options'
+import Feedback from './Feedback/Feedback'
+import Notification from './Notification/Notification'
 
-  const totalFeedback = good + neutral + bad;
-  const positiveFeedback = Math.round((good / totalFeedback) * 100);
+export default function App() {
+  const [values, setValues] = useState(() => {
+    const savClicks = window.localStorage.getItem("m-click");
+    return savClicks !== null ? JSON.parse(savClicks) : {
+      good: 0,
+      neutral: 0,
+      bad: 0
+    };
+  });
 
-  const updateFeedback = feedbackType => {
-    if (feedbackType === 'reset') {
-      setReviews({ good: 0, neutral: 0, bad: 0 });
-      localStorage.removeItem('reviews');
-    } else {
-      const updeatedReviews = {
-        ...reviews,
-        [feedbackType]: reviews[feedbackType] + 1,
-      };
+  useEffect(() => {
+    window.localStorage.setItem("m-click", JSON.stringify(values));
+  }, [values]);
 
-      setReviews(updeatedReviews);
+  const updateFeedback = (option) => {
+    setValues({
+      ...values,
+      [option]: values[option] + 1
+    });
+  }
 
-      localStorage.setItem('reviews', JSON.stringify(updeatedReviews));
-    }
-  };
+  const resetValue = () => {
+    setValues({
+      good: 0,
+      neutral: 0,
+      bad: 0
+    })
+  }
+  const totalFeedback = values.good + values.neutral + values.bad;
+  const positiveFeedback = Math.round((values.good / totalFeedback) * 100);
 
-
-
-      <Options updateFeedback={updateFeedback} totalFeedback={totalFeedback} />
-
-      {totalFeedback === 0 && <Notification />}
-
-      {totalFeedback !== 0 && (
-        <Feedback
-          good={good}
-          neutral={neutral}
-          bad={bad}
-          totalFeedback={totalFeedback}
-          positiveFeedback={positiveFeedback}
-        />
-      )}
-    </>
-  );
+  return (
+    <div className={css.container}>
+      <>
+        <Description />
+        <Options updateFeedback={updateFeedback} resetValue={resetValue} totalFeedback={totalFeedback} />
+        {totalFeedback > 0 ? <Feedback values={values} positiveFeedback={positiveFeedback} totalFeedback={totalFeedback} /> : <Notification />}
+      </>
+    </div>
+  )
 }
-
-export default App;

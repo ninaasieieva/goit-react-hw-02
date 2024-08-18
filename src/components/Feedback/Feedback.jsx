@@ -1,13 +1,14 @@
-const Feedback = ({ good, neutral, bad, totalFeedback, positiveFeedback }) => {
+import css from "./Feedback.module.css"
+export default function Feedback(
+    { values, totalFeedback, positiveFeedback }
+) {
     return (
-      <div>
-        <p>Good: {good}</p>
-        <p>Neutral:{neutral} </p>
-        <p>Bad: {bad}</p>
-        <p>Total: {totalFeedback}</p>
-        <p>Positive: {positiveFeedback}%</p>
-      </div>
-    );
-  };
-  
-  export default Feedback;
+        <>
+            <p className={css.paragrText}>Good: {values.good} </p>
+            <p className={css.paragrText}>Neutral: {values.neutral}</p>
+            <p className={css.paragrText}>Bad: {values.bad}</p>
+            <p className={css.paragrText}>Total: {totalFeedback}</p>
+            <p className={css.paragrText}>Positive: {positiveFeedback}%</p>
+        </>
+    )
+}
